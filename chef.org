@@ -1,0 +1,41 @@
+* chef
+** 使用
+   [[https://cloudblogg.com/devops/chef-writing-cookbook-to-configure-apache-webserver/][Chef : Writing cookbook to configure apache webserver -]]
+   #+begin_src sh
+     wget https://packages.chef.io/files/stable/chefdk/4.13.3/el/7/chefdk-4.13.3-1.el7.x86_64.rpm
+     cd cookbooks
+     chef generate cookbook apache
+     cd apache/
+     vi recipes/default.rb
+     mkdir -p files/default
+     vi files/default/index.html
+     knife cookbook upload apache
+     knife bootstrap 192.168.33.21 — sudo -U vagrant -N chefnode1 # chefnode1.nokiasas.com
+     knife node run_list add chefnode1 "recipe[apache]"
+     chef-client
+     systemctl status httpd
+
+   #+end_src
+   #+begin_src ruby
+     package "httpd" do
+       action:install
+     end
+
+     service "httpd" do
+       action [:enable, :start]
+     end
+
+     cookbook_file "/var/www/html/index.html" do
+       source "index.html"
+       mode "0644"
+     end
+
+   #+end_src
+   #+begin_src html
+     <html>
+       <body>
+	 <h1>hello, world</h1>
+       </body>
+     </html>
+   #+end_src
+
